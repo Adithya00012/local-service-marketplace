@@ -7,6 +7,7 @@ import com.localservice.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.localservice.backend.exception.ResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Helper: converts a User entity into a safe response DTO (no password)
     private UserResponseDTO toResponseDTO(User user) {
@@ -44,7 +47,7 @@ public class UserService {
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword()); // NOTE: still plain text for now - fixed in Phase 5
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole());
 
         User saved = userRepository.save(user);
@@ -57,7 +60,7 @@ public class UserService {
 
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole());
 
         User updated = userRepository.save(user);
