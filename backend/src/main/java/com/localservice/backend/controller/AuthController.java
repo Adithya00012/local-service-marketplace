@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.localservice.backend.exception.InvalidCredentialsException;
+import com.localservice.backend.exception.DuplicateEmailException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,8 +30,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody UserRequestDTO dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
+        throw new DuplicateEmailException("An account with this email already exists");
+    }
 
         User user = new User();
         user.setName(dto.getName());
