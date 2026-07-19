@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { getAllServices, createService, deleteService } from '../api/services';
 import { createBooking } from '../api/bookings';
 import { useAuth } from '../context/AuthContext';
-import { getReviewsForService } from '../api/reviews';
 
 function ServicesPage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showForm, setShowForm] = useState(false);
+
+    const [searchTitle, setSearchTitle] = useState('');
+    const [searchCategory, setSearchCategory] = useState('');
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -22,18 +26,30 @@ function ServicesPage() {
 
     useEffect(() => {
         loadServices();
-    }, []);
+    }, [page]);
 
     async function loadServices() {
         setLoading(true);
         try {
-            const data = await getAllServices();
-            setServices(data);
+            const data = await getAllServices({
+                page,
+                size: 6,
+                title: searchTitle,
+                category: searchCategory,
+            });
+            setServices(data.content);
+            setTotalPages(data.totalPages);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
+    }
+
+    function handleSearch(e) {
+        e.preventDefault();
+        setPage(0);
+        loadServices();
     }
 
     async function handleCreate(e) {
@@ -93,6 +109,29 @@ function ServicesPage() {
                     </button>
                 )}
             </div>
+
+            <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+                <input
+                    type="text"
+                    placeholder="Search by title..."
+                    value={searchTitle}
+                    onChange={(e) => setSearchTitle(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md flex-1"
+                />
+                <input
+                    type="text"
+                    placeholder="Category..."
+                    value={searchCategory}
+                    onChange={(e) => setSearchCategory(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md flex-1"
+                />
+                <button
+                    type="submit"
+                    className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900"
+                >
+                    Search
+                </button>
+            </form>
 
             {error && <p className="text-red-600 mb-4">{error}</p>}
 
@@ -177,6 +216,28 @@ function ServicesPage() {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-6">
+                    <button
+                        onClick={() => setPage(Math.max(0, page - 1))}
+                        disabled={page === 0}
+                        className="px-3 py-1 bg-white border border-gray-300 rounded disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-sm text-gray-600">
+                        Page {page + 1} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                        disabled={page >= totalPages - 1}
+                        className="px-3 py-1 bg-white border border-gray-300 rounded disabled:opacity-50"
+                    >
+                        Next
+                    </button>
                 </div>
             )}
         </div>

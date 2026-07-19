@@ -20,8 +20,16 @@ public class ServiceController {
     private ServiceManagementService serviceManagementService;
 
     @GetMapping
-    public List<ServiceResponseDTO> getAllServices() {
-        return serviceManagementService.getAllServices();
+    public org.springframework.data.domain.Page<ServiceResponseDTO> getAllServices(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size,
+                org.springframework.data.domain.Sort.by(sortBy));
+
+        return serviceManagementService.searchServices(title, category, pageable);
     }
 
     @GetMapping("/{id}")
