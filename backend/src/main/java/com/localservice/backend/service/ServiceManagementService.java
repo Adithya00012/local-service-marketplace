@@ -71,4 +71,25 @@ public class ServiceManagementService {
 
         serviceRepository.delete(service);
     }
+
+    public org.springframework.data.domain.Page<ServiceResponseDTO> searchServices(
+            String title, String category, org.springframework.data.domain.Pageable pageable) {
+        org.springframework.data.domain.Page<com.localservice.backend.model.Service> page;
+
+        boolean hasTitle = title != null && !title.isBlank();
+        boolean hasCategory = category != null && !category.isBlank();
+
+        if (hasTitle && hasCategory) {
+            page = serviceRepository.findByCategoryContainingIgnoreCaseAndTitleContainingIgnoreCase(category, title,
+                    pageable);
+        } else if (hasTitle) {
+            page = serviceRepository.findByTitleContainingIgnoreCase(title, pageable);
+        } else if (hasCategory) {
+            page = serviceRepository.findByCategoryContainingIgnoreCase(category, pageable);
+        } else {
+            page = serviceRepository.findAll(pageable);
+        }
+
+        return page.map(this::toResponseDTO);
+    }
 }

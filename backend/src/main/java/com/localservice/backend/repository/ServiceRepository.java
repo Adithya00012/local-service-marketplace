@@ -1,10 +1,16 @@
 package com.localservice.backend.repository;
 
 import com.localservice.backend.model.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface ServiceRepository extends JpaRepository<Service, Long> {
-    List<Service> findByProviderId(Long providerId);
+
+    Page<Service> findByCategoryContainingIgnoreCaseAndTitleContainingIgnoreCase(
+            String category, String title, Pageable pageable);
+
+    Page<Service> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    Page<Service> findByCategoryContainingIgnoreCase(String category, Pageable pageable);
 }
