@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class ServiceController {
         return serviceManagementService.getServiceById(id);
     }
 
+    @PreAuthorize("hasRole('PROVIDER')")
     @PostMapping
     public ServiceResponseDTO createService(
             @Valid @RequestBody ServiceRequestDTO dto,
