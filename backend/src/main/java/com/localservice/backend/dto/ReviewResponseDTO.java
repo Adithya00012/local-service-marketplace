@@ -9,13 +9,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingResponseDTO {
+public class ReviewResponseDTO {
     private Long id;
-    private String serviceTitle;
-    private Long serviceId;
+    private Integer rating;
+    private String comment;
     private String customerName;
-    private String providerName;
-    private String status;
-    private LocalDateTime bookingDate;
-    private boolean reviewed;
+    private LocalDateTime createdAt;
 }

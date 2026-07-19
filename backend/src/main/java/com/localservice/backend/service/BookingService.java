@@ -27,16 +27,23 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.localservice.backend.repository.ReviewRepository reviewRepository;
+
     private BookingResponseDTO toResponseDTO(Booking booking) {
-        return new BookingResponseDTO(
-                booking.getId(),
-                booking.getService().getTitle(),
-                booking.getService().getId(),
-                booking.getCustomer().getName(),
-                booking.getService().getProvider().getName(),
-                booking.getStatus().name(),
-                booking.getBookingDate());
-    }
+    boolean reviewed = reviewRepository.findByBookingId(booking.getId()).isPresent();
+
+    return new BookingResponseDTO(
+            booking.getId(),
+            booking.getService().getTitle(),
+            booking.getService().getId(),
+            booking.getCustomer().getName(),
+            booking.getService().getProvider().getName(),
+            booking.getStatus().name(),
+            booking.getBookingDate(),
+            reviewed
+    );
+}
 
     public BookingResponseDTO createBooking(BookingRequestDTO dto, String customerEmail) {
         User customer = userRepository.findByEmail(customerEmail)
