@@ -53,8 +53,18 @@ function DashboardPage() {
           </h1>
           <p className="text-sm text-gray-500">Welcome, {user?.name}</p>
         </div>
-        <a href="/services" className="text-blue-600 hover:underline mr-4">
-          Browse Services
+        <div className="flex items-center">
+          <a href="/services" className="text-blue-600 hover:underline mr-4">
+            Browse Services
+          </a>
+          <a href="/my-bookings" className="text-blue-600 hover:underline mr-4">
+            My Bookings
+          </a>
+
+          <a href="/received-bookings"
+          className="text-blue-600 hover:underline mr-4"
+          >
+          Received Bookings
         </a>
         <button
           onClick={handleLogout}
@@ -62,50 +72,51 @@ function DashboardPage() {
         >
           Log Out
         </button>
-      </header>
-
-      <main className="p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          All Users
-        </h2>
-
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-
-        {loading ? (
-          <p className="text-gray-500">Loading users...</p>
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="w-full text-left">
-              <thead className="bg-gray-100 text-gray-600 text-sm">
-                <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Email</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className="border-t border-gray-100">
-                    <td className="px-4 py-3">{u.name}</td>
-                    <td className="px-4 py-3">{u.email}</td>
-                    <td className="px-4 py-3">{u.role}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => handleDelete(u.id)}
-                        className="text-red-600 hover:underline text-sm"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </main>
     </div>
+      </header >
+
+    <main className="p-6">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">
+        All Users
+      </h2>
+
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+
+      {loading ? (
+        <p className="text-gray-500">Loading users...</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-gray-100 text-gray-600 text-sm">
+              <tr>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id} className="border-t border-gray-100">
+                  <td className="px-4 py-3">{u.name}</td>
+                  <td className="px-4 py-3">{u.email}</td>
+                  <td className="px-4 py-3">{u.role}</td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => handleDelete(u.id)}
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </main>
+    </div >
   );
 }
 
