@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllServices, createService, deleteService } from '../api/services';
 import { createBooking } from '../api/bookings';
 import { useAuth } from '../context/AuthContext';
+import { getReviewsForService } from '../api/reviews';
 
 function ServicesPage() {
     const [services, setServices] = useState([]);
