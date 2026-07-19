@@ -53,6 +53,9 @@ function DashboardPage() {
           </h1>
           <p className="text-sm text-gray-500">Welcome, {user?.name}</p>
         </div>
+        <a href="/services" className="text-blue-600 hover:underline mr-4">
+          Browse Services
+        </a>
         <button
           onClick={handleLogout}
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
