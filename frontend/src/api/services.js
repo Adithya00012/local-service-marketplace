@@ -17,3 +17,7 @@ export function createService(title, description, price, category) {
 export function deleteService(id) {
   return request(`/services/${id}`, { method: 'DELETE' });
 }
+
+export function semanticSearchServices(query) {
+  return request(`/services/search/semantic?query=${encodeURIComponent(query)}`);
+}

@@ -5,6 +5,7 @@ import { createBooking } from '../api/bookings';
 import { useAuth } from '../context/AuthContext';
 import { generateDescription } from '../api/ai';
 import { getReviewSummary } from '../api/reviews';
+import { semanticSearchServices } from '../api/services';
 
 function ServicesPage() {
     const [services, setServices] = useState([]);
@@ -29,6 +30,9 @@ function ServicesPage() {
     const [expandedServiceId, setExpandedServiceId] = useState(null);
     const [summary, setSummary] = useState('');
     const [loadingSummary, setLoadingSummary] = useState(false);
+
+    const [aiQuery, setAiQuery] = useState('');
+    const [aiSearching, setAiSearching] = useState(false);
 
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -139,6 +143,22 @@ function ServicesPage() {
         }
     }
 
+    async function handleAiSearch(e) {
+        e.preventDefault();
+        if (!aiQuery.trim()) return;
+        setAiSearching(true);
+        setError('');
+        try {
+            const results = await semanticSearchServices(aiQuery);
+            setServices(results);
+            setTotalPages(0); // hide normal pagination for AI search results
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setAiSearching(false);
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="flex justify-between items-center mb-6">
@@ -173,6 +193,22 @@ function ServicesPage() {
                     className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900"
                 >
                     Search
+                </button>
+            </form>
+            <form onSubmit={handleAiSearch} className="flex gap-2 mb-6">
+                <input
+                    type="text"
+                    placeholder="✨ Describe what you need (e.g. 'my tap is leaking')..."
+                    value={aiQuery}
+                    onChange={(e) => setAiQuery(e.target.value)}
+                    className="px-3 py-2 border border-purple-300 rounded-md flex-1"
+                />
+                <button
+                    type="submit"
+                    disabled={aiSearching}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
+                >
+                    {aiSearching ? 'Searching...' : 'AI Search'}
                 </button>
             </form>
 

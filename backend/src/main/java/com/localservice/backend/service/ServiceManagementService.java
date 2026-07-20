@@ -21,6 +21,9 @@ public class ServiceManagementService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EmbeddingService embeddingService;
+
     private ServiceResponseDTO toResponseDTO(com.localservice.backend.model.Service service) {
         return new ServiceResponseDTO(
                 service.getId(),
@@ -57,6 +60,10 @@ public class ServiceManagementService {
         service.setCategory(dto.getCategory());
         service.setProvider(provider);
 
+        String textToEmbed = dto.getTitle() + ". " + (dto.getDescription() != null ? dto.getDescription() : "");
+        List<Double> embedding = embeddingService.generateEmbedding(textToEmbed);
+        service.setEmbedding(embeddingService.embeddingToString(embedding));
+
         com.localservice.backend.model.Service saved = serviceRepository.save(service);
         return toResponseDTO(saved);
     }
@@ -91,5 +98,41 @@ public class ServiceManagementService {
         }
 
         return page.map(this::toResponseDTO);
+    }
+
+    public List<ServiceResponseDTO> semanticSearch(String query) {
+        List<Double> queryEmbedding = embeddingService.generateEmbedding(query);
+
+        List<com.localservice.backend.model.Service> allServices = serviceRepository.findAll();
+
+        return allServices.stream()
+                .filter(s -> s.getEmbedding() != null && !s.getEmbedding().isBlank())
+                .map(s -> {
+                    List<Double> serviceEmbedding = embeddingService.stringToEmbedding(s.getEmbedding());
+                    double similarity = embeddingService.cosineSimilarity(queryEmbedding, serviceEmbedding);
+                    return new java.util.AbstractMap.SimpleEntry<>(s, similarity);
+                })
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(10)
+                .map(entry -> toResponseDTO(entry.getKey()))
+                .collect(Collectors.toList());
+    }
+
+    public int backfillEmbeddings() {
+        List<com.localservice.backend.model.Service> allServices = serviceRepository.findAll();
+        int count = 0;
+
+        for (com.localservice.backend.model.Service service : allServices) {
+            if (service.getEmbedding() == null || service.getEmbedding().isBlank()) {
+                String textToEmbed = service.getTitle() + ". " +
+                        (service.getDescription() != null ? service.getDescription() : "");
+                List<Double> embedding = embeddingService.generateEmbedding(textToEmbed);
+                service.setEmbedding(embeddingService.embeddingToString(embedding));
+                serviceRepository.save(service);
+                count++;
+            }
+        }
+
+        return count;
     }
 }
