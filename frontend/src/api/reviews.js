@@ -10,3 +10,7 @@ export function createReview(bookingId, rating, comment) {
     body: JSON.stringify({ bookingId, rating, comment }),
   });
 }
+
+export function getReviewSummary(serviceId) {
+  return request(`/reviews/service/${serviceId}/summary`);
+}

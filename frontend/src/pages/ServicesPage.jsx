@@ -4,6 +4,7 @@ import { getAllServices, createService, deleteService } from '../api/services';
 import { createBooking } from '../api/bookings';
 import { useAuth } from '../context/AuthContext';
 import { generateDescription } from '../api/ai';
+import { getReviewSummary } from '../api/reviews';
 
 function ServicesPage() {
     const [services, setServices] = useState([]);
@@ -24,6 +25,10 @@ function ServicesPage() {
 
     const [keywords, setKeywords] = useState('');
     const [generating, setGenerating] = useState(false);
+
+    const [expandedServiceId, setExpandedServiceId] = useState(null);
+    const [summary, setSummary] = useState('');
+    const [loadingSummary, setLoadingSummary] = useState(false);
 
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -113,6 +118,24 @@ function ServicesPage() {
             setError(err.message);
         } finally {
             setGenerating(false);
+        }
+    }
+
+    async function handleToggleReviews(serviceId) {
+        if (expandedServiceId === serviceId) {
+            setExpandedServiceId(null);
+            return;
+        }
+        setExpandedServiceId(serviceId);
+        setLoadingSummary(true);
+        setSummary('');
+        try {
+            const result = await getReviewSummary(serviceId);
+            setSummary(result.summary);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoadingSummary(false);
         }
     }
 
@@ -231,8 +254,20 @@ function ServicesPage() {
                             <p className="text-gray-600 text-sm mb-2">{s.description}</p>
                             <p className="text-blue-600 font-bold">₹{s.price}</p>
                             <p className="text-xs text-gray-400 mt-2">by {s.providerName}</p>
+                            <button
+                                onClick={() => handleToggleReviews(s.id)}
+                                className="text-purple-600 text-xs hover:underline mt-1"
+                            >
+                                {expandedServiceId === s.id ? 'Hide Reviews' : '✨ AI Review Summary'}
+                            </button>
 
-                            <div className="mt-2 space-x-3">
+                            {expandedServiceId === s.id && (
+                                <div className="mt-2 p-2 bg-purple-50 rounded text-xs text-gray-700">
+                                    {loadingSummary ? 'Summarizing reviews...' : summary}
+                                </div>
+                            )}
+
+                            <div className="mt-2 space-x-3">    
                                 {user && user.role === 'CUSTOMER' && (
                                     <button
                                         onClick={() => handleBook(s.id)}

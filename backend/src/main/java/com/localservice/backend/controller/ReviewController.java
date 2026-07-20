@@ -30,4 +30,10 @@ public class ReviewController {
     public List<ReviewResponseDTO> getReviewsForService(@PathVariable Long serviceId) {
         return reviewService.getReviewsForService(serviceId);
     }
+
+    @GetMapping("/service/{serviceId}/summary")
+    public java.util.Map<String, String> getReviewSummary(@PathVariable Long serviceId) {
+        String summary = reviewService.summarizeReviews(serviceId);
+        return java.util.Map.of("summary", summary);
+    }
 }

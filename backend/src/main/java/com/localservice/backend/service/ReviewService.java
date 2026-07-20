@@ -62,4 +62,27 @@ public class ReviewService {
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    @Autowired
+    private GeminiService geminiService;
+
+    public String summarizeReviews(Long serviceId) {
+        List<ReviewResponseDTO> reviews = getReviewsForService(serviceId);
+
+        if (reviews.isEmpty()) {
+            return "No reviews yet for this service.";
+        }
+
+        StringBuilder reviewText = new StringBuilder();
+        for (ReviewResponseDTO r : reviews) {
+            reviewText.append("Rating: ").append(r.getRating()).append("/5. ");
+            reviewText.append("Comment: ").append(r.getComment() != null ? r.getComment() : "No comment").append("\n");
+        }
+
+        String prompt = "Summarize the following customer reviews for a service in 2-3 sentences. "
+                + "Mention common positive themes and any recurring complaints if present. "
+                + "Do not use markdown formatting.\n\n" + reviewText;
+
+        return geminiService.generateText(prompt);
+    }
 }
