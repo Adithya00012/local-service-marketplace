@@ -26,4 +26,7 @@ public class Service {
     @ManyToOne
     @JoinColumn(name = "provider_id", nullable = false)
     private User provider;
+
+    @Column(columnDefinition = "TEXT")
+    private String embedding;
 }

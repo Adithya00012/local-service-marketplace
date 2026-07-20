@@ -73,4 +73,16 @@ public class ServiceController {
         String description = geminiService.generateText(prompt);
         return java.util.Map.of("description", description.trim());
     }
+
+    @GetMapping("/search/semantic")
+    public List<ServiceResponseDTO> semanticSearch(@RequestParam String query) {
+        return serviceManagementService.semanticSearch(query);
+    }
+
+    @PreAuthorize("hasRole('PROVIDER')")
+    @PostMapping("/backfill-embeddings")
+    public java.util.Map<String, Object> backfillEmbeddings() {
+        int updated = serviceManagementService.backfillEmbeddings();
+        return java.util.Map.of("servicesUpdated", updated);
+    }
 }
