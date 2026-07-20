@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllServices, createService, deleteService } from '../api/services';
 import { createBooking } from '../api/bookings';
 import { useAuth } from '../context/AuthContext';
+import { generateDescription } from '../api/ai';
 
 function ServicesPage() {
     const [services, setServices] = useState([]);
@@ -20,6 +21,9 @@ function ServicesPage() {
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    const [keywords, setKeywords] = useState('');
+    const [generating, setGenerating] = useState(false);
 
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -96,6 +100,22 @@ function ServicesPage() {
         }
     }
 
+    async function handleGenerateDescription() {
+        if (!title) {
+            setError('Enter a title first');
+            return;
+        }
+        setGenerating(true);
+        try {
+            const result = await generateDescription(title, keywords);
+            setDescription(result.description);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setGenerating(false);
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="flex justify-between items-center mb-6">
@@ -154,6 +174,23 @@ function ServicesPage() {
                         onChange={(e) => setDescription(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="Keywords for AI (e.g. 5 years experience, eco-friendly)"
+                            value={keywords}
+                            onChange={(e) => setKeywords(e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleGenerateDescription}
+                            disabled={generating}
+                            className="bg-purple-600 text-white px-3 py-2 rounded-md text-sm hover:bg-purple-700 disabled:opacity-50"
+                        >
+                            {generating ? 'Generating...' : '✨ AI Generate'}
+                        </button>
+                    </div>
                     <input
                         type="number"
                         placeholder="Price"
