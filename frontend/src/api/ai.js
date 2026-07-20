@@ -6,3 +6,7 @@ export function generateDescription(title, keywords) {
     body: JSON.stringify({ title, keywords }),
   });
 }
+
+export function askChatbot(question) {
+  return request(`/services/chat?question=${encodeURIComponent(question)}`);
+}
