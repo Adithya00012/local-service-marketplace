@@ -25,7 +25,7 @@ public class ServiceManagementService {
     private EmbeddingService embeddingService;
 
     @Autowired
-    private GeminiService geminiService;
+    private AiTextService aiTextService;
 
     private ServiceResponseDTO toResponseDTO(com.localservice.backend.model.Service service) {
         return new ServiceResponseDTO(
@@ -165,6 +165,6 @@ public class ServiceManagementService {
                 + "If none of the listed services are actually relevant to their question, politely say so instead of making something up. "
                 + "Do not use markdown formatting.";
 
-        return geminiService.generateText(prompt);
+        return aiTextService.generateText(prompt);
     }
 }

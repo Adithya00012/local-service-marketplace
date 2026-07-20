@@ -12,7 +12,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 @Component
-public class GeminiService {
+public class AiTextService {
 
         @Value("${groq.api.key}")
         private String apiKey;

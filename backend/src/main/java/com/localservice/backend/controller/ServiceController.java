@@ -2,7 +2,7 @@ package com.localservice.backend.controller;
 
 import com.localservice.backend.dto.ServiceRequestDTO;
 import com.localservice.backend.dto.ServiceResponseDTO;
-import com.localservice.backend.service.GeminiService;
+import com.localservice.backend.service.AiTextService;
 import com.localservice.backend.service.ServiceManagementService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class ServiceController {
     private ServiceManagementService serviceManagementService;
 
     @Autowired
-    private GeminiService geminiService;
+    private AiTextService aiTextService;
 
     @GetMapping
     public org.springframework.data.domain.Page<ServiceResponseDTO> getAllServices(
@@ -70,7 +70,7 @@ public class ServiceController {
                 + "Service title: " + title + ". "
                 + "Key details to include: " + keywords;
 
-        String description = geminiService.generateText(prompt);
+        String description = aiTextService.generateText(prompt);
         return java.util.Map.of("description", description.trim());
     }
 
