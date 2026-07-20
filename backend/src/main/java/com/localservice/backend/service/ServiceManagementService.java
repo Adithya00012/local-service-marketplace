@@ -24,6 +24,9 @@ public class ServiceManagementService {
     @Autowired
     private EmbeddingService embeddingService;
 
+    @Autowired
+    private GeminiService geminiService;
+
     private ServiceResponseDTO toResponseDTO(com.localservice.backend.model.Service service) {
         return new ServiceResponseDTO(
                 service.getId(),
@@ -134,5 +137,34 @@ public class ServiceManagementService {
         }
 
         return count;
+    }
+
+    public String chatQuery(String question) {
+        List<ServiceResponseDTO> relevantServices = semanticSearch(question);
+
+        StringBuilder context = new StringBuilder();
+        if (relevantServices.isEmpty()) {
+            context.append("No services are currently available in the marketplace.");
+        } else {
+            int limit = Math.min(5, relevantServices.size());
+            for (int i = 0; i < limit; i++) {
+                ServiceResponseDTO s = relevantServices.get(i);
+                context.append("- ").append(s.getTitle())
+                        .append(" (Category: ").append(s.getCategory())
+                        .append(", Price: ₹").append(s.getPrice())
+                        .append(", Provider: ").append(s.getProviderName())
+                        .append("): ").append(s.getDescription())
+                        .append("\n");
+            }
+        }
+
+        String prompt = "You are a helpful assistant for a local service marketplace app. "
+                + "A customer asked: \"" + question + "\"\n\n"
+                + "Here are the most relevant services currently available:\n" + context + "\n"
+                + "Based ONLY on the services listed above, answer the customer's question helpfully and concisely (2-4 sentences). "
+                + "If none of the listed services are actually relevant to their question, politely say so instead of making something up. "
+                + "Do not use markdown formatting.";
+
+        return geminiService.generateText(prompt);
     }
 }

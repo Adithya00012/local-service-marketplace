@@ -85,4 +85,10 @@ public class ServiceController {
         int updated = serviceManagementService.backfillEmbeddings();
         return java.util.Map.of("servicesUpdated", updated);
     }
+
+    @GetMapping("/chat")
+    public java.util.Map<String, String> chat(@RequestParam String question) {
+        String answer = serviceManagementService.chatQuery(question);
+        return java.util.Map.of("answer", answer);
+    }
 }

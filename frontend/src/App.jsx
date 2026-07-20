@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import ServicesPage from './pages/ServicesPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ReceivedBookingsPage from './pages/ReceivedBookingsPage';
+import ChatWidget from './components/ChatWidget';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
+      <ChatWidget />
     </AuthProvider>
   );
 }
