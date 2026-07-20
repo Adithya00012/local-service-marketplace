@@ -2,6 +2,7 @@ package com.localservice.backend.controller;
 
 import com.localservice.backend.dto.ServiceRequestDTO;
 import com.localservice.backend.dto.ServiceResponseDTO;
+import com.localservice.backend.service.GeminiService;
 import com.localservice.backend.service.ServiceManagementService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ServiceController {
 
     @Autowired
     private ServiceManagementService serviceManagementService;
+
+    @Autowired
+    private GeminiService geminiService;
 
     @GetMapping
     public org.springframework.data.domain.Page<ServiceResponseDTO> getAllServices(
@@ -41,8 +45,7 @@ public class ServiceController {
     @PostMapping
     public ServiceResponseDTO createService(
             @Valid @RequestBody ServiceRequestDTO dto,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
         String providerEmail = authentication.getName();
         return serviceManagementService.createService(dto, providerEmail);
     }
@@ -50,9 +53,24 @@ public class ServiceController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteService(
             @PathVariable Long id,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
         serviceManagementService.deleteService(id, authentication.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('PROVIDER')")
+    @PostMapping("/generate-description")
+    public java.util.Map<String, String> generateDescription(
+            @RequestBody java.util.Map<String, String> request) {
+        String title = request.get("title");
+        String keywords = request.getOrDefault("keywords", "");
+
+        String prompt = "Write a short, professional, appealing service listing description "
+                + "(2-3 sentences, no markdown, no headers) for a local service marketplace. "
+                + "Service title: " + title + ". "
+                + "Key details to include: " + keywords;
+
+        String description = geminiService.generateText(prompt);
+        return java.util.Map.of("description", description.trim());
     }
 }
