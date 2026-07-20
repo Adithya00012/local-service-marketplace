@@ -64,7 +64,7 @@ public class ReviewService {
     }
 
     @Autowired
-    private GeminiService geminiService;
+    private AiTextService aiTextService;
 
     public String summarizeReviews(Long serviceId) {
         List<ReviewResponseDTO> reviews = getReviewsForService(serviceId);
@@ -83,6 +83,6 @@ public class ReviewService {
                 + "Mention common positive themes and any recurring complaints if present. "
                 + "Do not use markdown formatting.\n\n" + reviewText;
 
-        return geminiService.generateText(prompt);
+        return aiTextService.generateText(prompt);
     }
 }
